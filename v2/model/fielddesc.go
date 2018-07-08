@@ -160,6 +160,14 @@ func (self *FieldDescriptor) RepeatCheck() bool {
 	return self.Meta.GetBool("RepeatCheck")
 }
 
+func (self *FieldDescriptor) ClientOnly() bool {
+	return self.Meta.GetBool("ClientOnly")
+}
+
+func (self *FieldDescriptor) ServerOnly() bool {
+	return self.Meta.GetBool("ServerOnly")
+}
+
 var strByFieldDescriptor = map[FieldType]string{
 	FieldType_None:   "none",
 	FieldType_Int32:  "int32",

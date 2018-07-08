@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/davyxu/tabtoy/util"
-	"github.com/davyxu/tabtoy/v2/i18n"
-	"github.com/davyxu/tabtoy/v2/model"
+	"github.com/0990/tabtoy/util"
+	"github.com/0990/tabtoy/v2/i18n"
+	"github.com/0990/tabtoy/v2/model"
 )
 
 /*
@@ -95,7 +95,7 @@ func (self *DataHeader) ParseProtoField(index int, sheet *Sheet, localFD *model.
 
 	if index == 0 {
 		// 添加第一个数据表的定义
-		if !self.makeRowDescriptor(localFD, self.headerFields) {
+		if !self.makeRowDescriptor(sheet, localFD, self.headerFields) {
 			goto ErrorStop
 		}
 	}
@@ -214,15 +214,22 @@ func (self *DataHeader) addHeaderElement(he *DataHeaderElement, localFD *model.F
 	return -1
 }
 
-func (self *DataHeader) makeRowDescriptor(fileD *model.FileDescriptor, rootField []*model.FieldDescriptor) bool {
+func (self *DataHeader) makeRowDescriptor(sheet *Sheet, fileD *model.FileDescriptor, rootField []*model.FieldDescriptor) bool {
 
 	rowType := model.NewDescriptor()
 	rowType.Usage = model.DescriptorUsage_RowType
-	rowType.Name = fmt.Sprintf("%sDefine", fileD.Pragma.GetString("TableName"))
+	if len(sheet.File.Sheets) > 2 {
+		rowType.Name = fmt.Sprintf("%sDefine", sheet.Name)
+	} else {
+		rowType.Name = fmt.Sprintf("%sDefine", fileD.Pragma.GetString("TableName"))
+	}
+
 	rowType.Kind = model.DescriptorKind_Struct
 
 	// 类型已经存在, 说明是自己定义的 XXDefine, 不允许
 	if _, ok := fileD.DescriptorByName[rowType.Name]; ok {
+		//test by xujialong
+		//rowType.Name = rowType.Name+"1"
 		log.Errorf("%s '%s'", i18n.String(i18n.DataHeader_UseReservedTypeName), rowType.Name)
 		return false
 	}

@@ -3,8 +3,8 @@ package v2
 import (
 	"strings"
 
-	"github.com/davyxu/tabtoy/v2/i18n"
-	"github.com/davyxu/tabtoy/v2/model"
+	"github.com/0990/tabtoy/v2/i18n"
+	"github.com/0990/tabtoy/v2/model"
 	"github.com/tealeg/xlsx"
 )
 
@@ -82,7 +82,9 @@ func (self *File) ExportLocalType(mainFile *File) bool {
 			dataHeader := newDataHeadSheet()
 
 			// 检查引导头
-			if !dataHeader.ParseProtoField(len(self.dataSheets), dSheet.Sheet, self.LocalFD, self.GlobalFD) {
+			//test by xujialong
+			if !dataHeader.ParseProtoField(0, dSheet.Sheet, self.LocalFD, self.GlobalFD) {
+				//if !dataHeader.ParseProtoField(len(self.dataSheets), dSheet.Sheet, self.LocalFD, self.GlobalFD) {
 				return false
 			}
 
@@ -116,17 +118,20 @@ func (self *File) IsVertical() bool {
 }
 
 func (self *File) ExportData(dataModel *model.DataModel, parentHeader *DataHeader) bool {
-
+	parentHeaderParm := parentHeader
 	for index, d := range self.dataSheets {
 
 		log.Infof("            %s", d.Name)
 
 		// 多个sheet时, 使用和多文件一样的父级
+		//if parentHeader == nil && len(self.dataHeaders) > 1 {
+		//	parentHeader = self.dataHeaders[0]
+		//}
 		if parentHeader == nil && len(self.dataHeaders) > 1 {
-			parentHeader = self.dataHeaders[0]
+			parentHeaderParm = self.dataHeaders[index]
 		}
 
-		if !d.Export(self, dataModel, self.dataHeaders[index], parentHeader) {
+		if !d.Export(self, dataModel, self.dataHeaders[index], parentHeaderParm) {
 			return false
 		}
 	}

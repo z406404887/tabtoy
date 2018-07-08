@@ -1,8 +1,8 @@
 package v2
 
 import (
-	"github.com/davyxu/tabtoy/v2/i18n"
-	"github.com/davyxu/tabtoy/v2/model"
+	"github.com/0990/tabtoy/v2/i18n"
+	"github.com/0990/tabtoy/v2/model"
 )
 
 type DataHeaderElement struct {
