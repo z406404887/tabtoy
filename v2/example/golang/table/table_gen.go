@@ -4,8 +4,8 @@
 package table
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -103,6 +103,7 @@ type SampleDefine struct {
 	//BuffID
 	BuffID []int32
 
+	//位置
 	Pos *Vec2
 
 	//类型

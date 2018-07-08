@@ -403,7 +403,9 @@ namespace table
 		/// </summary>
 		public List<int> BuffID = new List<int>(); 
 		
-		
+		/// <summary> 
+		/// 位置
+		/// </summary>
 		public Vec2 Pos = new Vec2(); 
 		
 		/// <summary> 
