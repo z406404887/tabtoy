@@ -82,8 +82,6 @@ func (self *File) ExportLocalType(mainFile *File) bool {
 			dataHeader := newDataHeadSheet()
 
 			// 检查引导头
-			//test by xujialong
-			//if !dataHeader.ParseProtoField(0, dSheet.Sheet, self.LocalFD, self.GlobalFD) {
 			if !dataHeader.ParseProtoField(len(self.dataSheets), dSheet.Sheet, self.LocalFD, self.GlobalFD) {
 				return false
 			}
