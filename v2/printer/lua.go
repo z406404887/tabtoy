@@ -144,7 +144,7 @@ func printTableLua(g *Globals, stream *Stream, tab *model.Table) bool {
 					havePrintfieldNode:=false
 					// 遍历一个结构体的字段
 					for _, fieldNode := range structNode.Child {
-						if fieldNode.ClientOnly() {
+						if fieldNode.ServerOnly() {
 							continue
 						}
 
