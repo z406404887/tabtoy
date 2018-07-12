@@ -93,12 +93,25 @@ func (self *DataHeader) ParseProtoField(index int, sheet *Sheet, localFD *model.
 		return false
 	}
 
-	if index == 0 {
+	if localFD.Pragma.GetBool("MultiTable"){
 		// 添加第一个数据表的定义
 		if !self.makeRowDescriptor(sheet, localFD, self.headerFields) {
 			goto ErrorStop
 		}
+	}else{
+		if index ==0{
+			// 添加第一个数据表的定义
+			if !self.makeRowDescriptor(sheet, localFD, self.headerFields) {
+				goto ErrorStop
+			}
+		}
 	}
+	//if index == 0 &&!localFD.Pragma.GetBool("MultiTable"){
+	//	// 添加第一个数据表的定义
+	//	if !self.makeRowDescriptor(sheet, localFD, self.headerFields) {
+	//		goto ErrorStop
+	//	}
+	//}
 
 	return true
 
@@ -218,7 +231,7 @@ func (self *DataHeader) makeRowDescriptor(sheet *Sheet, fileD *model.FileDescrip
 
 	rowType := model.NewDescriptor()
 	rowType.Usage = model.DescriptorUsage_RowType
-	if len(sheet.File.Sheets) > 2 {
+	if  fileD.Pragma.GetBool("MultiTable") {
 		rowType.Name = fmt.Sprintf("%sDefine", sheet.Name)
 	} else {
 		rowType.Name = fmt.Sprintf("%sDefine", fileD.Pragma.GetString("TableName"))
@@ -228,8 +241,6 @@ func (self *DataHeader) makeRowDescriptor(sheet *Sheet, fileD *model.FileDescrip
 
 	// 类型已经存在, 说明是自己定义的 XXDefine, 不允许
 	if _, ok := fileD.DescriptorByName[rowType.Name]; ok {
-		//test by xujialong
-		//rowType.Name = rowType.Name+"1"
 		log.Errorf("%s '%s'", i18n.String(i18n.DataHeader_UseReservedTypeName), rowType.Name)
 		return false
 	}

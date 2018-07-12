@@ -9,6 +9,7 @@ import (
 	"github.com/0990/tabtoy/v2/printer"
 )
 
+
 func Run(g *printer.Globals) bool {
 
 	if !g.PreExport() {
@@ -84,37 +85,85 @@ func Run(g *printer.Globals) bool {
 
 		log.Infoln(filepath.Base(file.FileName))
 
-		dataModel := model.NewDataModel()
+		//多sheet处理
+		if file.LocalFD.Pragma.GetBool("MultiTable"){
+			sheetLen:=len(file.dataSheets)
+			for index, d := range file.dataSheets {
 
-		tab := model.NewTable()
-		tab.LocalFD = file.LocalFD
+				log.Infof("            %s", d.Name)
 
-		// 主表
-		if !file.ExportData(dataModel, nil) {
-			return false
-		}
+				dataModel := model.NewDataModel()
 
-		// 子表提供数据
-		for _, mergeFile := range file.mergeList {
+				tab := model.NewTable()
+				localFD :=*file.LocalFD
+				localFD.Name = d.Name
+				descriptorLen:=len(localFD.Descriptors)
 
-			log.Infoln(filepath.Base(mergeFile.FileName), "--->", filepath.Base(file.FileName))
+				localFD.Descriptors = append(localFD.Descriptors[:descriptorLen-sheetLen],localFD.Descriptors[descriptorLen-sheetLen+index])
 
-			// 电子表格数据导出到Table对象
-			if !mergeFile.ExportData(dataModel, file.Header) {
+				//for i,v:=range localFD.Descriptors{
+				//	newFile := *v.File
+				//	newFile.Name = d.Name
+				//	localFD.Descriptors[i].File= &newFile
+				//}
+
+				newFile := *localFD.Descriptors[len(localFD.Descriptors)-1].File
+				newFile.Name = d.Name
+				localFD.Descriptors[len(localFD.Descriptors)-1].File= &newFile
+
+				if localFD.Descriptors[len(localFD.Descriptors)-1].Name!= d.Name+"Define"{
+					log.Infof("multitable export error!")
+					return false
+				}
+
+				tab.LocalFD = &localFD
+
+				if !d.Export(file, dataModel, file.dataHeaders[index], file.dataHeaders[index]) {
+					return false
+				}
+
+				// 合并所有值到node节点
+				if !mergeValues(dataModel, tab, file) {
+					return false
+				}
+
+				// 整合类型信息和数据
+				if !g.AddContent(tab) {
+					return false
+				}
+			}
+		}else{
+			dataModel := model.NewDataModel()
+
+			tab := model.NewTable()
+			tab.LocalFD = file.LocalFD
+
+			// 主表
+			if !file.ExportData(dataModel, nil) {
+				return false
+			}
+
+			// 子表提供数据
+			for _, mergeFile := range file.mergeList {
+
+				log.Infoln(filepath.Base(mergeFile.FileName), "--->", filepath.Base(file.FileName))
+
+				// 电子表格数据导出到Table对象
+				if !mergeFile.ExportData(dataModel, file.Header) {
+					return false
+				}
+			}
+
+			// 合并所有值到node节点
+			if !mergeValues(dataModel, tab, file) {
+				return false
+			}
+
+			// 整合类型信息和数据
+			if !g.AddContent(tab) {
 				return false
 			}
 		}
-
-		// 合并所有值到node节点
-		if !mergeValues(dataModel, tab, file) {
-			return false
-		}
-
-		// 整合类型信息和数据
-		if !g.AddContent(tab) {
-			return false
-		}
-
 	}
 
 	// 根据各种导出类型, 调用各导出器导出

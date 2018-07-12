@@ -28,9 +28,12 @@ var (
 	paramPara = flag.Bool("para", false, "parallel export by your cpu count")
 
 	paramLanguage = flag.String("lan", "en_us", "set output language")
+
 )
 
 var (
+	paramProtoImport       = flag.String("protoimport", "", "proto import header")
+	paramProtoOutputIgnoreFile       = flag.String("protooutputignorefile", "", "protooutputignorefile")
 	paramPackageName       = flag.String("package", "", "override the package name in table @Types")
 	paramCombineStructName = flag.String("combinename", "Config", "combine struct name, code struct name")
 	paramProtoOut          = flag.String("proto_out", "", "output protobuf define (*.proto)")
@@ -100,6 +103,8 @@ func V2Entry() {
 	g.LuaTabHeader = *paramLuaTabHeader
 	g.GenCSSerailizeCode = *paramGenCSharpBinarySerializeCode
 	g.PackageName = *paramPackageName
+	g.ProtoImport = *paramProtoImport
+	g.Protooutputignorefile  = *paramProtoOutputIgnoreFile
 
 	if *paramProtoOut != "" {
 		g.AddOutputType("proto", *paramProtoOut)

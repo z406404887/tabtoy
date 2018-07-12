@@ -19,6 +19,8 @@ type Globals struct {
 	LuaTabHeader       string
 	GenCSSerailizeCode bool
 	PackageName        string
+	ProtoImport        string
+	Protooutputignorefile string
 
 	Printers []*PrinterContext
 
@@ -140,7 +142,10 @@ func (self *Globals) AddContent(tab *model.Table) bool {
 	rowFD.IsRepeated = true
 	rowFD.Order = int32(len(self.CombineStruct.Fields) + 1)
 	rowFD.Comment = localFD.Name
-	self.CombineStruct.Add(rowFD)
+
+	//if !localFD.MatchServerForbidSheet(localFD.Name){
+		self.CombineStruct.Add(rowFD)
+	//}
 
 	if localFD.RowDescriptor() == nil {
 		panic("row field null:" + localFD.Name)

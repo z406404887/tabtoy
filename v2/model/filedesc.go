@@ -18,6 +18,24 @@ func (self *FileDescriptor) MatchTag(tag string) bool {
 
 }
 
+//不允许导客户端
+func (self *FileDescriptor)MatchClientForbidSheet(sheetName string)bool{
+	if !self.Pragma.ContainKey("ClientForbid") {
+		return false
+	}
+
+	return self.Pragma.ContainValue("ClientForbid", sheetName)
+}
+
+//不允许导服务端
+func (self *FileDescriptor)MatchServerForbidSheet(sheetName string)bool{
+	if !self.Pragma.ContainKey("ServerForbid") {
+		return false
+	}
+
+	return self.Pragma.ContainValue("ServerForbid", sheetName)
+}
+
 // 取行类型的结构
 func (self *FileDescriptor) RowDescriptor() *Descriptor {
 
